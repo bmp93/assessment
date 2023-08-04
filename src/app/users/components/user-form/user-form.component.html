@@ -1,0 +1,24 @@
+<form [formGroup]="userForm">
+    <div class="form-group">
+        <label for="fname">First Name</label>
+        <input type="text" class="form-control" id="fname" placeholder="Enter first name" formControlName="firstName">
+    </div>
+    <div class="form-group">
+        <label for="lname">Last Name</label>
+        <input type="text" class="form-control" id="lname" placeholder="Enter last name" formControlName="lastName">
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" id="inlineRadio1" value="male" formControlName="gender">
+        <label class="form-check-label" for="inlineRadio1">Male</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" id="inlineRadio2" value="female" formControlName="gender">
+        <label class="form-check-label" for="inlineRadio2">Female</label>
+    </div><br/>
+    <button type="button" (click)="saveUser()" class="btn btn-primary">Submit</button>
+
+    <pre>
+        {{id}}
+        {{userForm.value | json}}
+    </pre>
+</form>

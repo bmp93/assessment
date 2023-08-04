@@ -1,0 +1,13 @@
+{"users" : [
+    {"id": 1, "firstName":"Superman", "lastName": "sup", "gender": "male"},
+    {"id": 2, "firstName":"Batman", "lastName": "bat", "gender": "male"},
+    {"id": 5, "firstName":"BatGirl", "lastName": "bg", "gender": "female"},
+    {"id": 3, "firstName":"Robin", "lastName": "rb", "gender": "male"},
+    {"id": 4, "firstName":"Rose", "lastName": "fl", "gender": "female"},
+    {"id": 6, "firstName":"Max", "lastName": "super", "gender": "male"},
+    {"id": 7, "firstName":"Mona", "lastName": "Seth", "gender": "male"},
+    {"id": 8, "firstName":"Joker", "lastName": "jojo", "gender": "female"},
+    {"id": 9, "firstName":"Jeni", "lastName": "robert", "gender": "male"},
+    {"id": 10, "firstName":"Honey", "lastName": "SIngh", "gender": "female"}
+]
+ }
