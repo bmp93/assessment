@@ -90,7 +90,6 @@ export class UserListComponent implements OnInit {
   }
 
   exportToWord() {
-    debugger
     const table = new Table({
       rows: this.getRows(),
     });

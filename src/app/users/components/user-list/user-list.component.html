@@ -43,12 +43,12 @@
                 Export To <span class="caret"></span>
             </button>
             <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
-                <li role="menuitem"><a class="dropdown-item" href="#" (click)="exportexcel(false)">Excel (Without
+                <li role="menuitem"><a class="dropdown-item" (click)="exportexcel(false)">Excel (Without
                         Status)</a></li>
-                <li role="menuitem"><a class="dropdown-item" href="#" (click)="exportexcel(true)">Excel (With
+                <li role="menuitem"><a class="dropdown-item" (click)="exportexcel(true)">Excel (With
                         Status)</a></li>
-                <li role="menuitem"><a class="dropdown-item" href="#" (click)="exportToPdf()">Pdf</a></li>
-                <li role="menuitem"><a class="dropdown-item" href="#" (click)="exportToWord()">Docx</a></li>
+                <li role="menuitem"><a class="dropdown-item" (click)="exportToPdf()">Pdf</a></li>
+                <li role="menuitem"><a class="dropdown-item" (click)="exportToWord()">Docx</a></li>
             </ul>
         </div>
     </div>
