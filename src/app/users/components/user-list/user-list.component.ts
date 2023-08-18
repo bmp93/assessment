@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PageChangedEvent } from 'ngx-bootstrap/pagination';
 import { UserService } from '../../services/user.service';
 import * as XLSX from 'xlsx';
-import { map } from 'rxjs';
+import { forkJoin, mergeMap, switchMap } from 'rxjs';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'
 import autoTable from 'jspdf-autotable';
@@ -18,6 +18,7 @@ export class UserListComponent implements OnInit {
   users = new Array();
   currentPage: number = 1;
   totalItems: number = 0;
+  itemsPerPage: number = 5;
 
   constructor(private userService: UserService) {
   }
@@ -27,10 +28,13 @@ export class UserListComponent implements OnInit {
   }
 
   getUsers() {
-    this.userService.getUsers(this.currentPage).subscribe(
-      (next: any) => {
-        this.users = next.data;
-        this.totalItems = next.totalUsers;
+    this.userService.getUsers(this.currentPage, this.itemsPerPage).subscribe(
+      async (response: any) => {
+        for (const user of response.users) {
+          user.status = await this.userService.getStatus();
+        }
+        this.users = response.users || response;
+        this.totalItems = response.totalUsers || 10;
       }, (err: any) => {
         console.log(err)
       }
@@ -52,18 +56,11 @@ export class UserListComponent implements OnInit {
       })
   }
 
-  async exportexcel(withStatus = false) {
+  async exportexcel() {
     /* table id is passed over here */
     // let element = document.getElementById('user-table');
     // const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
     let users = JSON.parse(JSON.stringify(this.users));
-
-    if (withStatus) {
-      for (const user of users) {
-        user.status = await this.userService.getStatus();
-        console.log(user)
-      }
-    }
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(users);
 
@@ -84,6 +81,7 @@ export class UserListComponent implements OnInit {
         { header: 'First Name', dataKey: 'firstName' },
         { header: 'Last Name', dataKey: 'lastName' },
         { header: 'Gender', dataKey: 'gender' },
+        { header: 'Status', dataKey: 'status' },
       ]
     });
     doc.save("table.pdf");
@@ -123,6 +121,9 @@ export class UserListComponent implements OnInit {
         }),
         new TableCell({
           children: [new Paragraph('Gender')],
+        }),
+        new TableCell({
+          children: [new Paragraph('Status')],
         })
       ]
     }))
@@ -137,7 +138,7 @@ export class UserListComponent implements OnInit {
   }
 
   getCells(user: any) {
-    const keysToConsider = ['firstName', 'lastName', 'gender'];
+    const keysToConsider = ['firstName', 'lastName', 'gender', 'status'];
     const cells: TableCell[] = [];
     keysToConsider.forEach(key => {
       cells.push(new TableCell({

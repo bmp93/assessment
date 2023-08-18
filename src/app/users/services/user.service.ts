@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map, of, throwError } from 'rxjs';
+import { Observable, forkJoin, map, of, switchMap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { User, UserListResponse } from '../model/user.model';
 
 @Injectable()
 export class UserService {
@@ -26,33 +27,73 @@ export class UserService {
 
   /**
    * 
-   * @param pageNumber 
+   * @param pageNumber : current page
+   * @param pageSize : items per page
    * @returns filtered paginated data based on page number
    */
-  getUsers(pageNumber: number): Observable<any> {
+  getUsers(pageNumber: number, pageSize: number = 5): Observable<any> {
     // return this.http.get(this.url).pipe(map((res: any) => {
     //   const startIndex = pageNumber ? (pageNumber - 1)* 5 :  pageNumber;
     //   const endIndex = startIndex + 5;
     //   const userToDisplay = res.users.slice(startIndex, endIndex);
     //   const response = {
     //     status: '200',
-    //     data: userToDisplay,
-    //     totalUsers: res.users.length
+    //     data: {
+    //        users: userToDisplay,
+    //        totalUsers: this.users.length
+    //      }
     //   }
     //   return response;
     // }))
-    
+
     // throw new Error('My Pretty Error');
-    const startIndex = pageNumber ? (pageNumber - 1) * 5 : pageNumber;
-    const endIndex = startIndex + 5;
-    const userToDisplay = this.users.slice(startIndex, endIndex);
+
+
+    const startIndex = pageNumber ? (pageNumber - 1) * pageSize : pageNumber;
+    const endIndex = startIndex + pageSize;
+    const userToDisplay: User[] = this.users.slice(startIndex, endIndex);
     const response = {
       status: '200',
-      data: userToDisplay,
-      totalUsers: this.users.length
+      data: {
+        users: userToDisplay,
+        totalUsers: this.users.length
+      },
     }
-    return of(response);
+
+    return of(response.data as UserListResponse);
   }
+
+  getUsersWithStatus(pageNumber: number, pageSize: number = 5): Observable<any> {
+    const startIndex = pageNumber ? (pageNumber - 1) * pageSize : pageNumber;
+    const endIndex = startIndex + pageSize;
+    const userToDisplay: User[] = this.users.slice(startIndex, endIndex);
+    const response = {
+      status: '200',
+      data: {
+        users: userToDisplay,
+        totalUsers: this.users.length
+      },
+    }
+    return of(response.data).pipe(
+      switchMap((data) => {
+        const observables: Observable<any>[] = [];
+
+        data.users.forEach((user) => {
+          observables.push(
+            this.getUserStatus(user.id).pipe(
+              map((status) => ({
+                ...user,
+                status: status,
+              }))
+            )
+          );
+        });
+
+        return forkJoin(observables);
+      })
+    )
+  }
+
 
   /**
    * 
@@ -106,7 +147,7 @@ export class UserService {
 
   getStatus(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.getStatusFromServer()
+      this.getUserStatus(1)
         .subscribe({
           next: (data) => resolve(data),
           error: (err) => reject(err),
@@ -114,7 +155,7 @@ export class UserService {
     });
   }
 
-  getStatusFromServer() {
+  getUserStatus(id: any) {
     let status = ["Red", "Blue",
       "Yellow", "Green"];
 
